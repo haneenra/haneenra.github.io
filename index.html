@@ -1582,6 +1582,7 @@ body{background:radial-gradient(60vmax 50vmax at 15% 0%,color-mix(in srgb,var(--
 /* ===== home: like button on the portrait ===== */
 .portrait .like{position:absolute;left:50%;bottom:17%;translate:-50% 0;z-index:3;pointer-events:auto;display:inline-flex;align-items:center;gap:.55rem;padding:.55rem 1.1rem .55rem .85rem;border-radius:999px;border:1px solid rgba(255,255,255,.38);background:rgba(10,10,10,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--white);font:inherit;cursor:pointer;direction:ltr;box-shadow:0 10px 30px rgba(0,0,0,.45);transition:border-color .3s,box-shadow .3s;animation:likeIn .6s cubic-bezier(.2,.7,.2,1) both}
 .portrait .like[hidden]{display:none}
+.like:has(.like-n[hidden]){padding-inline:.85rem}
 .like-h{position:relative;display:grid;place-items:center;width:22px;height:22px}
 .like-h svg{width:22px;height:22px;fill:transparent;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;transition:fill .3s,stroke .3s,transform .35s cubic-bezier(.34,1.56,.64,1)}
 .like:hover,.like:focus-visible{border-color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.2),0 0 22px rgba(255,255,255,.22)}
@@ -1989,7 +1990,7 @@ body{background:radial-gradient(60vmax 50vmax at 15% 0%,color-mix(in srgb,var(--
       </div>
       <div class="portrait rv" style="--i:2">
         <div class="me"><canvas class="glit" id="glit" aria-hidden="true"></canvas><img src="assets/me.webp" alt="Haneen Al-Rababa" width="1023" height="1514"></div>
-        <button class="like" id="like" type="button" aria-pressed="false" hidden><span class="like-h" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20.6s-7.5-4.5-9.5-9.2C1.1 8 3.1 4.6 6.6 4.3c2.1-.2 4 .9 5.4 2.9 1.4-2 3.3-3.1 5.4-2.9 3.5.3 5.5 3.7 4.1 7.1-2 4.7-9.5 9.2-9.5 9.2z"/></svg></span><b class="like-n">0</b><span class="vh"><span class="la">أعجبني</span><span class="le">Like</span></span></button>
+        <button class="like" id="like" type="button" aria-pressed="false"><span class="like-h" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20.6s-7.5-4.5-9.5-9.2C1.1 8 3.1 4.6 6.6 4.3c2.1-.2 4 .9 5.4 2.9 1.4-2 3.3-3.1 5.4-2.9 3.5.3 5.5 3.7 4.1 7.1-2 4.7-9.5 9.2-9.5 9.2z"/></svg></span><b class="like-n" hidden>0</b><span class="vh"><span class="la">أعجبني</span><span class="le">Like</span></span></button>
       </div>
       <div class="stats rv" style="--i:5">
         <div><b>4</b><span><span class="la">سنوات خبرة</span><span class="le">Years of experience</span></span></div>
@@ -3836,15 +3837,16 @@ hint(false);
   const btn=document.getElementById('like');if(!btn)return;
   const API='https://abacus.jasoncameron.dev',NS='haneenra.github.io',KEY='likes';
   const num=btn.querySelector('.like-n');
-  let liked=false,val=0,busy=false;
+  /* the heart shows at once; the number appears when the counter answers (the free service can be slow) */
+  let liked=false,val=null,busy=false;
   try{liked=localStorage.getItem('pf-liked')==='1'}catch(e){}
-  const show=v=>{val=v;num.textContent=v.toLocaleString('en-US');num.classList.remove('tick');void num.offsetWidth;num.classList.add('tick')};
+  const show=v=>{val=v;num.textContent=v.toLocaleString('en-US');num.hidden=false;num.classList.remove('tick');void num.offsetWidth;num.classList.add('tick')};
   const mark=l=>{liked=l;btn.classList.toggle('on',l);btn.setAttribute('aria-pressed',l?'true':'false')};
   mark(liked);
-  const ac=new AbortController(),to=setTimeout(()=>ac.abort(),8000);
+  const ac=new AbortController(),to=setTimeout(()=>ac.abort(),30000);
   fetch(API+'/get/'+NS+'/'+KEY,{signal:ac.signal,cache:'no-store'})
     .then(r=>r.status===404?{value:0}:(r.ok?r.json():Promise.reject(r.status)))
-    .then(d=>{clearTimeout(to);if(typeof d.value!=='number')return;show(Math.max(d.value,liked?1:0));btn.hidden=false})
+    .then(d=>{clearTimeout(to);if(typeof d.value==='number'&&val===null)show(Math.max(d.value,liked?1:0))})
     .catch(()=>clearTimeout(to));
   function burst(){
     if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -3855,12 +3857,12 @@ hint(false);
   btn.addEventListener('click',()=>{
     btn.classList.remove('pulse');void btn.offsetWidth;btn.classList.add('pulse');
     if(liked||busy)return;
-    busy=true;mark(true);show(val+1);burst();
+    busy=true;mark(true);if(val!==null)show(val+1);burst();
     try{localStorage.setItem('pf-liked','1')}catch(e){}
-    fetch(API+'/hit/'+NS+'/'+KEY,{cache:'no-store'})
+    fetch(API+'/hit/'+NS+'/'+KEY,{cache:'no-store',keepalive:true})
       .then(r=>r.ok?r.json():Promise.reject(r.status))
       .then(d=>{if(typeof d.value==='number'&&d.value!==val)show(d.value)})
-      .catch(()=>{mark(false);show(Math.max(0,val-1));try{localStorage.removeItem('pf-liked')}catch(e){}})
+      .catch(()=>{mark(false);if(val!==null)show(Math.max(0,val-1));try{localStorage.removeItem('pf-liked')}catch(e){}})
       .finally(()=>{busy=false});
   });
 })();
