@@ -1599,20 +1599,27 @@ body{background:radial-gradient(60vmax 50vmax at 15% 0%,color-mix(in srgb,var(--
 @media (max-width:900px){.portrait .like{inset-inline-end:.1rem;bottom:15%}}
 @media (prefers-reduced-motion:reduce){.portrait .like,.like.pulse .like-h svg,.like-n.tick,.like-p{animation:none}}
 
-/* ===== contact: WhatsApp, call, email (column beside the portrait, home cards, menu) ===== */
+/* ===== contact: WhatsApp, call, email (floating icons bottom left, home cards, menu) ===== */
 .wa-ic{fill:currentColor}
-/* Instagram-style column beside the portrait: like, WhatsApp, call, email */
-.portrait .rail{position:absolute;inset-inline-end:-4.8rem;bottom:21%;z-index:3;display:flex;flex-direction:column;align-items:center;gap:.85rem;pointer-events:auto}
-.portrait .rail .like{position:relative;inset:auto}
-.rail .ra{display:flex;flex-direction:column;align-items:center;gap:.35rem;min-width:3.4rem;padding:.3rem;color:var(--white);-webkit-tap-highlight-color:transparent;animation:likeIn .6s cubic-bezier(.2,.7,.2,1) both}
-.rail .ra:nth-child(2){animation-delay:.08s}.rail .ra:nth-child(3){animation-delay:.16s}.rail .ra:nth-child(4){animation-delay:.24s}
-.rail .ra svg{width:32px;height:32px;color:var(--home);filter:drop-shadow(0 2px 6px rgba(0,0,0,.65));transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
-.rail .ra-wa svg{color:#25D366}
-.rail .ra:hover svg,.rail .ra:focus-visible svg{transform:scale(1.12)}
-.rail .ra:focus-visible{outline:2px solid var(--home);outline-offset:3px;border-radius:12px}
-.rail .ra small{font-size:.74rem;font-weight:700;line-height:1;color:var(--white);text-shadow:0 1px 4px rgba(0,0,0,.85);white-space:nowrap}
-@media (max-width:900px){.portrait .rail{inset-inline-end:.1rem;bottom:5%;gap:.55rem}.rail .ra svg{width:29px;height:29px}.rail .ra small{font-size:.68rem}}
-@media (prefers-reduced-motion:reduce){.rail .ra{animation:none}}
+/* floating icons, bottom left on every page; hover (or a first tap on phones) opens one into a labelled pill */
+.fab{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;direction:ltr;display:flex;flex-direction:column;align-items:flex-start;gap:.6rem;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.fab.lift{transform:translateY(-64px)}
+.fab a{position:relative;display:flex;align-items:center;height:50px;min-width:50px;padding:0 13px;border-radius:999px;background:rgba(20,20,20,.92);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.28);color:var(--white);box-shadow:0 6px 18px rgba(0,0,0,.55);font-family:var(--f);font-weight:800;font-size:.95rem;-webkit-tap-highlight-color:transparent;animation:fabIn .7s cubic-bezier(.2,.7,.2,1) both;transition:box-shadow .3s,border-color .3s}
+.fab a:nth-child(1){animation-delay:1.5s}.fab a:nth-child(2){animation-delay:1.62s}.fab a:nth-child(3){animation-delay:1.74s}
+.fab a svg{width:22px;height:22px;flex:none}
+.fab .fab-wa{background:#25D366;color:#062b12;border-color:transparent;box-shadow:0 10px 28px rgba(37,211,102,.38),0 6px 18px rgba(0,0,0,.5)}
+.fab .fab-wa svg{width:24px;height:24px}
+.fab .fab-wa::before{content:"";position:absolute;inset:0;border-radius:inherit;animation:waRing 2.4s ease-out infinite;pointer-events:none}
+.fab a.open,.fab a:focus-visible{box-shadow:var(--ring)}
+.fab-t{display:block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .45s cubic-bezier(.2,.7,.2,1),opacity .3s,margin .45s cubic-bezier(.2,.7,.2,1)}
+.fab a.open .fab-t,.fab a:focus-visible .fab-t{max-width:320px;opacity:1;margin-inline:.6rem .35rem}
+@media (hover:hover){.fab a:hover{box-shadow:var(--ring)}.fab a:hover .fab-t{max-width:320px;opacity:1;margin-inline:.6rem .35rem}}
+:root[data-lang="ar"] .fab-t{direction:rtl}
+.fab-n{font-family:var(--f-en);font-weight:400;direction:ltr;unicode-bidi:isolate;opacity:.85;margin-inline:.45rem}
+@keyframes fabIn{from{opacity:0;transform:translateX(-26px) scale(.8)}to{opacity:1;transform:none}}
+@keyframes waRing{0%{box-shadow:0 0 0 0 rgba(37,211,102,.65)}100%{box-shadow:0 0 0 16px rgba(37,211,102,0)}}
+@media (max-width:760px){.fab{gap:.5rem}.fab a{height:46px;min-width:46px;padding:0 11px;font-size:.9rem}}
+@media (prefers-reduced-motion:reduce){.fab a{animation:none}.fab .fab-wa::before{animation:none}}
 .ct-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:min(100%,980px);margin-top:.4rem}
 .ct{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:1.5rem 1rem 1.3rem;border-radius:22px;background:rgba(20,20,20,.84);backdrop-filter:blur(6px);border:1px solid var(--line);color:var(--white);text-align:center;transition:transform .25s,box-shadow .25s,border-color .25s}
 .ct:hover,.ct:focus-visible{transform:translateY(-3px);box-shadow:var(--ring);border-color:transparent}
@@ -2040,7 +2047,7 @@ body{background:radial-gradient(60vmax 50vmax at 15% 0%,color-mix(in srgb,var(--
       </div>
       <div class="portrait rv" style="--i:2">
         <div class="me"><canvas class="glit" id="glit" aria-hidden="true"></canvas><img src="assets/me.webp" alt="Haneen Al-Rababa" width="1023" height="1514"></div>
-        <div class="rail"><button class="like" id="like" type="button" aria-pressed="false"><span class="like-h" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20.6s-7.5-4.5-9.5-9.2C1.1 8 3.1 4.6 6.6 4.3c2.1-.2 4 .9 5.4 2.9 1.4-2 3.3-3.1 5.4-2.9 3.5.3 5.5 3.7 4.1 7.1-2 4.7-9.5 9.2-9.5 9.2z"/></svg></span><b class="like-n" hidden>0</b><span class="vh"><span class="la">أعجبني</span><span class="le">Like</span></span></button><a class="ra ra-wa" href="https://wa.me/962781020519" data-wa target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="wa-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><small><span class="la">واتساب</span><span class="le">WhatsApp</span></small></a><a class="ra ra-tel" href="tel:+962790420017" aria-label="Call"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><small><span class="la">اتصال</span><span class="le">Call</span></small></a><a class="ra ra-mail" href="mailto:haneen2001rababa@gmail.com" data-mail aria-label="Email"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><small><span class="la">البريد</span><span class="le">Email</span></small></a></div>
+        <button class="like" id="like" type="button" aria-pressed="false"><span class="like-h" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20.6s-7.5-4.5-9.5-9.2C1.1 8 3.1 4.6 6.6 4.3c2.1-.2 4 .9 5.4 2.9 1.4-2 3.3-3.1 5.4-2.9 3.5.3 5.5 3.7 4.1 7.1-2 4.7-9.5 9.2-9.5 9.2z"/></svg></span><b class="like-n" hidden>0</b><span class="vh"><span class="la">أعجبني</span><span class="le">Like</span></span></button>
       </div>
       <div class="stats rv" style="--i:5">
         <div><b>4</b><span><span class="la">سنوات خبرة</span><span class="le">Years of experience</span></span></div>
@@ -2584,6 +2591,7 @@ The curriculum file is attached. Start with intake.</pre>
     <span><span class="la">مسودة أولى · يُضاف المحتوى لاحقًا</span><span class="le">First draft · content to come</span></span>
   </div>
 </footer>
+<div class="fab" id="fab"><a class="fab-mail" href="mailto:haneen2001rababa@gmail.com" data-mail aria-label="Email"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span class="fab-t"><span class="la">راسلني بالبريد الإلكتروني</span><span class="le">Email me</span></span></a><a class="fab-tel" href="tel:+962790420017" aria-label="Call"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span class="fab-t"><span class="la">اتصل بي</span><span class="le">Call me</span><span class="fab-n">+962 79 042 0017</span></span></a><a class="fab-wa" href="https://wa.me/962781020519" data-wa target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="wa-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span class="fab-t"><span class="la">راسلني على واتساب</span><span class="le">WhatsApp me</span></span></a></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.453.0/dist/umd/lucide.min.js"></script>
@@ -3929,6 +3937,17 @@ hint(false);
     if(a.hasAttribute('data-wa'))a.href='https://wa.me/'+WA+'?text='+encodeURIComponent(TXT[lang()]);
     else a.href='mailto:'+MAIL+'?subject='+encodeURIComponent(SUBJ[lang()]);
   },true);
+  /* floating icons: on touch screens the first tap opens the pill, the second tap calls / chats / writes */
+  const fab=document.getElementById('fab');
+  if(fab){
+    const touch=matchMedia('(hover: none)'),shut=()=>fab.querySelectorAll('a.open').forEach(x=>x.classList.remove('open'));let tm;
+    fab.addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;
+      if(touch.matches&&!a.classList.contains('open')){e.preventDefault();shut();a.classList.add('open');clearTimeout(tm);tm=setTimeout(shut,5000)}});
+    document.addEventListener('click',e=>{if(!e.target.closest('#fab'))shut()});
+    /* the drawing corridor keeps its own controls in this corner: lift the icons above them while they show */
+    const gt=document.querySelectorAll('.gl-toggle');
+    if(gt.length&&'IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(x=>fab.classList.toggle('lift',x.isIntersecting)),{threshold:.1});gt.forEach(x=>io.observe(x))}
+  }
   /* phones: open / close the full experience and education */
   const exp=document.querySelector('.t-exp'),more=document.getElementById('exp-more');
   if(exp&&more)more.addEventListener('click',()=>{const o=!exp.classList.contains('open');exp.classList.toggle('open',o);more.setAttribute('aria-expanded',o?'true':'false');if(!o)exp.scrollIntoView({block:'start',behavior:'smooth'})});
