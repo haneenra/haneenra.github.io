@@ -1579,26 +1579,24 @@ body{background:radial-gradient(60vmax 50vmax at 15% 0%,color-mix(in srgb,var(--
 @media (prefers-reduced-motion:reduce){.gl-veil,.gl-img,.gl-info,.gl-page,.gl-list,.gl-ui{transition:none}}
 
 
-/* ===== home: like button on the portrait ===== */
-.portrait .like{position:absolute;left:50%;bottom:17%;translate:-50% 0;z-index:3;pointer-events:auto;display:inline-flex;align-items:center;gap:.55rem;padding:.55rem 1.1rem .55rem .85rem;border-radius:999px;border:1px solid rgba(255,255,255,.38);background:rgba(10,10,10,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--white);font:inherit;cursor:pointer;direction:ltr;box-shadow:0 10px 30px rgba(0,0,0,.45);transition:border-color .3s,box-shadow .3s;animation:likeIn .6s cubic-bezier(.2,.7,.2,1) both}
+/* ===== home: like button beside the portrait, Instagram style: a yellow heart with the count under it ===== */
+.portrait .like{position:absolute;inset-inline-end:-4.6rem;bottom:22%;z-index:3;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:.35rem;min-width:3.4rem;padding:.4rem .3rem;border:0;border-radius:14px;background:none;color:var(--white);font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;animation:likeIn .6s cubic-bezier(.2,.7,.2,1) both}
 .portrait .like[hidden]{display:none}
-.like:has(.like-n[hidden]){padding-inline:.85rem}
-.like-h{position:relative;display:grid;place-items:center;width:22px;height:22px}
-.like-h svg{width:22px;height:22px;fill:transparent;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;transition:fill .3s,stroke .3s,transform .35s cubic-bezier(.34,1.56,.64,1)}
-.like:hover,.like:focus-visible{border-color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.2),0 0 22px rgba(255,255,255,.22)}
-.like:hover .like-h svg{transform:scale(1.12)}
-.like.on{border-color:var(--home);box-shadow:0 0 22px color-mix(in srgb,var(--home) 32%,transparent)}
-.like.on .like-h svg{fill:var(--home);stroke:var(--home);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--home) 70%,transparent))}
+.like-h{position:relative;display:grid;place-items:center;width:34px;height:34px}
+.like-h svg{width:34px;height:34px;fill:transparent;stroke:var(--home);stroke-width:1.9;stroke-linejoin:round;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));transition:fill .3s,transform .35s cubic-bezier(.34,1.56,.64,1)}
+.like:hover .like-h svg,.like:focus-visible .like-h svg{transform:scale(1.12)}
+.like:focus-visible{outline:2px solid var(--home);outline-offset:3px}
+.like.on .like-h svg{fill:var(--home);filter:drop-shadow(0 0 8px color-mix(in srgb,var(--home) 65%,transparent)) drop-shadow(0 2px 6px rgba(0,0,0,.6))}
 .like.pulse .like-h svg{animation:likePop .5s cubic-bezier(.34,1.56,.64,1)}
-.like-n{font-family:var(--f-en);font-weight:700;font-size:1rem;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.like-n{font-family:var(--f-en);font-weight:700;font-size:.92rem;line-height:1;color:var(--white);text-shadow:0 1px 4px rgba(0,0,0,.85);font-variant-numeric:tabular-nums}
 .like-n.tick{animation:likeTick .35s ease-out}
 .like .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.like-p{position:absolute;left:calc(.85rem + 11px);top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:var(--home);pointer-events:none;animation:likeP .75s ease-out forwards}
+.like-p{position:absolute;left:50%;top:calc(.4rem + 17px);width:6px;height:6px;margin:-3px;border-radius:50%;background:var(--home);pointer-events:none;animation:likeP .75s ease-out forwards}
 @keyframes likeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes likePop{0%{transform:scale(1)}35%{transform:scale(1.45)}100%{transform:scale(1)}}
 @keyframes likeTick{from{opacity:.2;transform:translateY(-6px)}to{opacity:1;transform:none}}
 @keyframes likeP{from{opacity:1;transform:translate(0,0) scale(1)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
-@media (max-width:900px){.portrait .like{bottom:12%}}
+@media (max-width:900px){.portrait .like{inset-inline-end:.1rem;bottom:15%}}
 @media (prefers-reduced-motion:reduce){.portrait .like,.like.pulse .like-h svg,.like-n.tick,.like-p{animation:none}}
 /* ===== characters section (v5) ===== */
 .v5{margin-top:2rem;display:flex;flex-direction:column;gap:1.6rem}
@@ -3840,7 +3838,7 @@ hint(false);
   /* the heart shows at once; the number appears when the counter answers (the free service can be slow) */
   let liked=false,val=null,busy=false;
   try{liked=localStorage.getItem('pf-liked')==='1'}catch(e){}
-  const show=v=>{val=v;num.textContent=v.toLocaleString('en-US');num.hidden=false;num.classList.remove('tick');void num.offsetWidth;num.classList.add('tick')};
+  const show=v=>{val=v;num.textContent=new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v);num.hidden=false;num.classList.remove('tick');void num.offsetWidth;num.classList.add('tick')};
   const mark=l=>{liked=l;btn.classList.toggle('on',l);btn.setAttribute('aria-pressed',l?'true':'false')};
   mark(liked);
   const ac=new AbortController(),to=setTimeout(()=>ac.abort(),30000);
