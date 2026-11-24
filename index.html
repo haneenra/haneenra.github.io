@@ -3744,7 +3744,7 @@ document.querySelectorAll('.ptp-next').forEach(b=>b.addEventListener('click',()=
 
 </script>
 <script type="module">
-const BOARDS=[{"m": "pencil", "ar": 0.75}, {"m": "ink", "ar": 1}, {"m": "water", "ar": 0.8}, {"m": "digital", "ar": 1.33}, {"m": "pencil", "ar": 0.67}, {"m": "ink", "ar": 0.75}, {"m": "water", "ar": 1}, {"m": "digital", "ar": 0.8}];
+const BOARDS=[{"m": "spray_oil", "ar": 0.6939, "src": "assets/boards/01-moon-profile.webp"}, {"m": "decoupage", "ar": 0.8236, "src": "assets/boards/02-decoupage-heritage.webp", "note": {"ar": "\u0639\u0645\u0644\u064f \u062f\u064a\u0643\u0648\u0628\u0627\u062c \u0645\u0646 \u0642\u0637\u0639\u0629 \u062a\u0631\u0627\u062b\u064a\u0629 \u0648\u062e\u0631\u0632\u064d \u0648\u0639\u0645\u0644\u0627\u062a\u064d \u0645\u0639\u062f\u0646\u064a\u0629\u060c \u064a\u062d\u0643\u064a \u0639\u0646 \u0627\u0644\u062a\u0637\u0631\u064a\u0632 \u0648\u0627\u0644\u062a\u0631\u0627\u062b \u0627\u0644\u0639\u0631\u0628\u064a.", "en": "Decoupage made with a heritage textile piece, beads and metal coins. It speaks of embroidery and Arab heritage."}}, {"m": "acrylic_neon", "ar": 0.7131, "src": "assets/boards/03-neon-tree.webp", "note": {"ar": "\u0631\u064f\u0633\u0645\u062a \u0628\u0623\u0644\u0648\u0627\u0646 \u0627\u0644\u0623\u0643\u0631\u064a\u0644\u064a\u0643 \u0648\u0627\u0644\u0646\u064a\u0648\u0646\u060c \u0641\u062a\u0636\u064a\u0621 \u0641\u064a \u0627\u0644\u0644\u064a\u0644.", "en": "Painted in acrylic and neon paint, so it glows at night."}}, {"m": "tbd", "ar": 0.7506, "src": "assets/boards/04-blue-face.webp"}, {"m": "water", "ar": 0.6883, "src": "assets/boards/05-starry-cats.webp"}, {"m": "oil_charcoal", "ar": 0.748, "src": "assets/boards/06-charcoal-face.webp"}, {"m": "acrylic", "ar": 0.881, "src": "assets/boards/07-xmas-tree.webp"}, {"m": "oil", "ar": 0.8392, "src": "assets/boards/08-abstract-drips.webp"}];
 /* Hand drawing gallery: a first-person walk along a curved corridor; boards hang on both walls.
    Scrolling through the section walks forward (no scroll hijack), dragging and the arrows walk too.
    Click a board: the camera glides up to it. Click it again: its page opens. */
@@ -3753,7 +3753,7 @@ if(stage){
 const root=document.documentElement,ar=()=>(root.dataset.lang||'ar')==='ar',L=(a,e)=>ar()?a:e,pad=i=>String(i+1).padStart(2,'0');
 const MQ=q=>{try{return matchMedia(q).matches}catch(e){return false}};
 const reduce=MQ('(prefers-reduced-motion: reduce)'),SMQ='(max-width:819px),(orientation:portrait) and (max-width:1100px),(orientation:landscape) and (max-height:500px)';
-const MED={pencil:['رصاص','Pencil'],ink:['حبر','Ink'],water:['ألوان مائية','Watercolor'],digital:['رقمي باليد','Digital painting']};
+const MED={spray_oil:['ألوان الرش والزيت','Spray paint and oil'],decoupage:['ديكوباج','Decoupage'],acrylic_neon:['أكريليك وألوان نيون','Acrylic and neon paint'],acrylic:['أكريليك','Acrylic'],water:['ألوان مائية','Watercolour'],oil_charcoal:['ألوان الزيت والفحم','Oil paint and charcoal'],oil:['ألوان الزيت','Oil paint'],tbd:['','']};
 const med=m=>ar()?MED[m][0]:MED[m][1],N=BOARDS.length;
 const font=(w,px)=>w+' '+px+'px '+(ar()?'Almarai':'"Josefin Sans"')+', sans-serif';
 
@@ -3770,7 +3770,7 @@ function artCanvas(i){const b=BOARDS[i],w=512,h=Math.round(512/b.ar),c=document.
 function labelCanvas(i){const b=BOARDS[i],c=document.createElement('canvas');c.width=640;c.height=260;const x=c.getContext('2d');x.direction=ar()?'rtl':'ltr';x.textAlign='center';
   x.fillStyle='#f2f2f6';x.font=font(800,56);x.fillText(b.title?(ar()?b.title.ar:b.title.en):L('لوحة','Board')+' '+pad(i),320,80);
   x.fillStyle='rgba(242,242,246,.78)';x.font=font(400,44);x.fillText(med(b.m),320,148);
-  x.fillStyle='rgba(150,175,255,.85)';x.font='400 28px "JetBrains Mono", monospace';x.fillText(b.year?String(b.year):'SOON',320,212);return c}
+  x.fillStyle='rgba(150,175,255,.85)';x.font='400 28px "JetBrains Mono", monospace';if(b.year)x.fillText(String(b.year),320,212);return c}
 const artURL=i=>BOARDS[i].src||artCanvas(i).toDataURL('image/jpeg',.88);
 
 /* list view and the page (DOM) */
@@ -3879,9 +3879,9 @@ addEventListener('keydown',e=>{if(view.hidden||!vis)return;if(e.key==='Escape'){
 /* the board page */
 function openPage(i){const b=BOARDS[i];
   page.querySelector('.gl-img').src=artURL(i);
-  page.querySelector('.gl-info').innerHTML='<span class="bd-k">'+L('لوحة','Board')+' '+pad(i)+' / '+pad(N-1)+'</span><h3>'+(b.title?(ar()?b.title.ar:b.title.en):L('عنوان اللوحة','Artwork title'))+'</h3>'
-    +'<p>'+(b.note?(ar()?b.note.ar:b.note.en):L('تُضاف الرسمة وتفاصيلها عند رفعها.','The drawing and its details will be added once uploaded.'))+'</p>'
-    +'<div class="gl-meta"><div><b>'+med(b.m)+'</b><span>'+L('الخامة','Medium')+'</span></div><div><b class="ltr">'+(b.size||'—')+'</b><span>'+L('المقاس','Size')+'</span></div><div><b class="ltr">'+(b.year||'—')+'</b><span>'+L('السنة','Year')+'</span></div></div>';
+  page.querySelector('.gl-info').innerHTML='<span class="bd-k">'+L('لوحة','Board')+' '+pad(i)+' / '+pad(N-1)+'</span><h3>'+(b.title?(ar()?b.title.ar:b.title.en):L('لوحة','Board')+' '+pad(i))+'</h3>'
+    +(b.note?'<p>'+(ar()?b.note.ar:b.note.en)+'</p>':'')
+    +'<div class="gl-meta"><div><b>'+(med(b.m)||'—')+'</b><span>'+L('الخامة','Medium')+'</span></div><div><b class="ltr">'+(b.size||'—')+'</b><span>'+L('المقاس','Size')+'</span></div><div><b class="ltr">'+(b.year||'—')+'</b><span>'+L('السنة','Year')+'</span></div></div>';
   stage.classList.add('is-page');pill.classList.remove('on')}
 function closeOverlays(){stage.classList.remove('is-page','is-list');setToggle('gallery')}
 $('gl-back').onclick=closeOverlays;$('gl-lback').onclick=closeOverlays;
