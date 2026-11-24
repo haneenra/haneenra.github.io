@@ -3790,10 +3790,17 @@ const ctex=c=>{const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSp
 function vgrad(stops){const c=document.createElement('canvas');c.width=4;c.height=256;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,256);stops.forEach(s=>g.addColorStop(s[0],s[1]));x.fillStyle=g;x.fillRect(0,0,4,256);return ctex(c)}
 function rgrad(size,stops,r0){const c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d'),g=x.createRadialGradient(size/2,size/2,r0||0,size/2,size/2,size/2);stops.forEach(s=>g.addColorStop(s[0],s[1]));x.fillStyle=g;x.fillRect(0,0,size,size);return ctex(c)}
 const basic=(o)=>new THREE.MeshBasicMaterial(Object.assign({fog:true},o));
-const outer=new THREE.Mesh(new THREE.CylinderGeometry(R,R,HH,160,1,true),basic({map:vgrad([[0,'#0c0d11'],[.2,'#171922'],[.6,'#171922'],[.86,'#12141a'],[1,'#0b0c10']]),side:THREE.BackSide}));outer.position.y=HH/2;scene.add(outer);
-const inner=new THREE.Mesh(new THREE.CylinderGeometry(RIN,RIN,HH,120,1,true),basic({map:vgrad([[0,'#0f1015'],[.3,'#1b1d26'],[.8,'#15171e'],[1,'#0d0e12']]),side:THREE.FrontSide}));inner.position.y=HH/2;scene.add(inner);
-const floor=new THREE.Mesh(new THREE.CircleGeometry(R,160),basic({map:rgrad(1024,[[0,'#10131c'],[.55,'#161b2b'],[1,'#0d1017']],512*RIN/R)}));floor.rotation.x=-Math.PI/2;scene.add(floor);
-const ceil=new THREE.Mesh(new THREE.CircleGeometry(R,160),basic({color:0x07080a,side:THREE.BackSide}));ceil.rotation.x=-Math.PI/2;ceil.position.y=HH;scene.add(ceil);
+const outer=new THREE.Mesh(new THREE.CylinderGeometry(R,R,HH,160,1,true),basic({map:vgrad([[0,'#2e2d32'],[.05,'#27272d'],[.2,'#232429'],[.6,'#212228'],[.9,'#1e1f25'],[.955,'#1c1d23'],[.958,'#0d0e11'],[.985,'#111215'],[1,'#09090b']]),side:THREE.BackSide}));outer.position.y=HH/2;scene.add(outer);
+const inner=new THREE.Mesh(new THREE.CylinderGeometry(RIN,RIN,HH,120,1,true),basic({map:vgrad([[0,'#2e2d32'],[.05,'#27272d'],[.2,'#232429'],[.6,'#212228'],[.9,'#1e1f25'],[.955,'#1c1d23'],[.958,'#0d0e11'],[.985,'#111215'],[1,'#09090b']]),side:THREE.FrontSide}));inner.position.y=HH/2;scene.add(inner);
+/* walls are lighter than the floor and end in a dark skirting band, so wall, floor and ceiling read apart.
+   light: a warm line along the middle of the ceiling, a soft glow around it, its blurred reflection on the floor, and a pool of light under every board */
+const LR=(R+RIN)/2,LF=LR/R,LC='#fff2dc';
+function ring(S,stops){const c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d'),g=x.createRadialGradient(S/2,S/2,0,S/2,S/2,S/2);stops.forEach(s=>g.addColorStop(Math.max(0,Math.min(1,s[0])),s[1]));x.fillStyle=g;x.fillRect(0,0,S,S);return ctex(c)}
+const floor=new THREE.Mesh(new THREE.CircleGeometry(R,200),basic({map:ring(2048,[[0,'#0b0c0f'],[RIN/R,'#0c0d10'],[RIN/R+.03,'#111216'],[LF-.08,'#16171b'],[LF-.03,'#1d1d21'],[LF-.008,'#28272a'],[LF,'#302e2d'],[LF+.008,'#28272a'],[LF+.03,'#1d1d21'],[LF+.08,'#16171b'],[.975,'#0f1013'],[1,'#0b0c0f']])}));floor.rotation.x=-Math.PI/2;scene.add(floor);
+const ceil=new THREE.Mesh(new THREE.CircleGeometry(R,200),basic({map:ring(2048,[[0,'#07080a'],[LF-.14,'#08090b'],[LF-.06,'#111216'],[LF-.02,'#222227'],[LF-.006,'#433f39'],[LF,'#5e594f'],[LF+.006,'#433f39'],[LF+.02,'#222227'],[LF+.06,'#111216'],[LF+.13,'#09090c'],[1,'#08090b']]),side:THREE.BackSide}));ceil.rotation.x=-Math.PI/2;ceil.position.y=HH;scene.add(ceil);
+const strip=new THREE.Mesh(new THREE.RingGeometry(LR-.045,LR+.045,400,1),basic({color:LC,side:THREE.DoubleSide}));strip.rotation.x=Math.PI/2;strip.position.y=HH-.03;scene.add(strip);
+const stripSoft=new THREE.Mesh(new THREE.RingGeometry(LR-.17,LR+.17,400,1),basic({color:LC,transparent:true,opacity:.16,depthWrite:false,side:THREE.DoubleSide}));stripSoft.rotation.x=Math.PI/2;stripSoft.position.y=HH-.04;scene.add(stripSoft);
+const poolT=rgrad(256,[[0,'rgba(255,238,214,.11)'],[.45,'rgba(255,238,214,.05)'],[1,'rgba(255,238,214,0)']]);
 const haloT=rgrad(256,[[0,'rgba(170,190,255,.26)'],[.35,'rgba(150,175,255,.12)'],[1,'rgba(120,150,255,0)']]),shadowT=rgrad(256,[[0,'rgba(0,0,0,.55)'],[.25,'rgba(0,0,0,.4)'],[1,'rgba(0,0,0,0)']]);
 const frameM=basic({color:0xece7dc});
 let artT=[],labT=[];
@@ -3810,7 +3817,8 @@ function addBoard(i,a,rad,isOuter){const g=new THREE.Group();g.position.set(rad*
   const fr=new THREE.Mesh(new THREE.BoxGeometry(pw+.07,ph+.07,.06),frameM);fr.position.set(0,PY,.045);
   const art=new THREE.Mesh(new THREE.PlaneGeometry(pw,ph),basic({map:null}));art.position.set(0,PY,.077);art.userData={i,a,outer:isOuter};arts.push(art);picks.push(art);
   const lab=new THREE.Mesh(new THREE.PlaneGeometry(.92,.92*260/640),basic({map:null,transparent:true,depthWrite:false}));lab.position.set(0,PY-ph/2-.42,.02);lab.userData.i=i;labs.push(lab);
-  g.add(halo,sh,fr,art,lab);scene.add(g)}
+  const pool=new THREE.Mesh(new THREE.PlaneGeometry(pw*2.6,1.7),basic({map:poolT,transparent:true,depthWrite:false}));pool.rotation.x=-Math.PI/2;pool.position.set(0,.012,.72);
+  g.add(pool,halo,sh,fr,art,lab);scene.add(g)}
 for(let s=0;s<36;s++)addBoard(s%N,s*TAU/36,17.98,true);
 for(let k=0;k<24;k++)addBoard((k+4)%N,(k+.5)*TAU/24,12.22,false);
 function applyTextures(){makeTextures();arts.forEach(m=>{m.material.map=artT[m.userData.i];m.material.needsUpdate=true});labs.forEach(m=>{m.material.map=labT[m.userData.i];m.material.needsUpdate=true});dirty=true}
